@@ -1,9 +1,14 @@
 <script setup lang="ts">
+import AuthenticatedLayout from "@/layout/AuthenticatedLayout.vue";
 
-import Sidebar from "../components/Sidebar.vue";
+import {useI18n} from 'vue-i18n'
+
+const { t } = useI18n()
 </script>
 
 <template>
-  <Sidebar/>
+  <AuthenticatedLayout>
+    {{ t('hello_world') }}
+  </AuthenticatedLayout>
 </template>
 
