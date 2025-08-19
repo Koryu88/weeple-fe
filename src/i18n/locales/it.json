@@ -1,1 +1,16 @@
-{ "hello_world": "Ciao Mondo" }
+{
+  "menu": {
+    "library": "Libreria",
+    "stats": "Statistiche",
+    "tools": "Utilità",
+    "account": "Profilo"
+  },
+  "pages": {
+    "library": "Libreria",
+    "stats": "Statistiche",
+    "tools": "Utilità",
+    "account": "Profilo",
+    "login": "Accesso",
+    "notFound": "Pagina non trovata"
+  }
+}

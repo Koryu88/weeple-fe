@@ -19,3 +19,6 @@ export const i18n = createI18n({
     messages,
     warnHtmlMessage: false
 })
+
+
+export default i18n

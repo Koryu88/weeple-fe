@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import {computed} from 'vue'
 import {useRoute} from 'vue-router'
-import IconMdi from './IconMdi.vue'
+import IconMdi from '@/components/IconMdi.vue'
 
 const props = defineProps<{
   iconPath: string

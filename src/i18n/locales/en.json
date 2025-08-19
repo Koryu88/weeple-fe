@@ -1,1 +1,4 @@
-{ "hello_world": "Hello World" }
+{
+  "menu": { "library": "Library", "stats": "Stats", "tools": "Tools", "account": "Account" },
+  "pages": { "library": "Library", "stats": "Stats", "tools": "Tools", "account": "Account", "login": "Login", "notFound": "Page not found" }
+}
