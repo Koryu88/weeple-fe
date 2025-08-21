@@ -11,6 +11,10 @@
     "tools": "Utilità",
     "account": "Profilo",
     "login": "Accesso",
-    "notFound": "Pagina non trovata"
+    "notFound": {
+      "title": "Pagina non trovata",
+      "subtitle": "Ops! La pagina che cerchi non esiste.",
+      "backHome": "Torna alla Home"
+    }
   }
 }

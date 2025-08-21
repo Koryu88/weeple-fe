@@ -1,4 +1,20 @@
 {
-  "menu": { "library": "Library", "stats": "Stats", "tools": "Tools", "account": "Account" },
-  "pages": { "library": "Library", "stats": "Stats", "tools": "Tools", "account": "Account", "login": "Login", "notFound": "Page not found" }
+  "menu": {
+    "library": "Library",
+    "stats": "Stats",
+    "tools": "Tools",
+    "account": "Account"
+  },
+  "pages": {
+    "library": "Library",
+    "stats": "Stats",
+    "tools": "Tools",
+    "account": "Account",
+    "login": "Login",
+    "notFound": {
+      "title": "Page not found",
+      "subtitle": "Oops! The page you’re looking for doesn’t exist.",
+      "backHome": "Back to Home"
+    }
+  }
 }
