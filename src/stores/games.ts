@@ -1,67 +1,39 @@
 import { defineStore } from 'pinia'
-import type { Game } from '@/types/game'
+import type { Game, Genre, GameCreate } from '@/types/game'
+import { ApiGamesService, MockGamesService, type IGamesService } from '@/services/games.service'
 
+const useMock = import.meta.env.VITE_USE_MOCK === 'true'
+const apiBase = import.meta.env.VITE_API_BASE_URL || ''
+const service: IGamesService = useMock ? new MockGamesService() : new ApiGamesService(apiBase)
 
 export const useGamesStore = defineStore('games', {
     state: () => ({
-        genres: [
-            { id: 'party', name: 'Party' },
-            { id: 'strategy', name: 'Strategy' },
-            { id: 'family', name: 'Family' },
-            { id: 'thematic', name: 'Thematic' },
-        ] as { id: string; name: string }[],
-        games: [
-            {
-                id: 'g1',
-                name: 'Catan',
-                coverUrl: 'https://picsum.photos/seed/catan/400/280',
-                minAge: 10,
-                playersMin: 3,
-                playersMax: 4,
-                difficulty: 'medium',
-                rating: 4,
-                durationMins: 75,
-                genreId: 'strategy',
-                isOneShot: true,
-                isCoop: false,
-                isCompetitive: true,
-                favorite: true,
-                lastPlayedAt: '2025-06-15',
-            },
-            {
-                id: 'g2',
-                name: 'Pandemic',
-                coverUrl: 'https://picsum.photos/seed/pandemic/400/280',
-                minAge: 8,
-                playersMin: 2,
-                playersMax: 4,
-                difficulty: 'medium',
-                rating: 5,
-                durationMins: 60,
-                genreId: 'family',
-                isOneShot: true,
-                isCoop: true,
-                isCompetitive: false,
-                favorite: false,
-                lastPlayedAt: '2025-07-08',
-            },
-            {
-                id: 'g3',
-                name: 'The Crew',
-                coverUrl: 'https://picsum.photos/seed/crew/400/280',
-                minAge: 10,
-                playersMin: 3,
-                playersMax: 5,
-                difficulty: 'easy',
-                rating: 4,
-                durationMins: 20,
-                genreId: 'party',
-                isOneShot: true,
-                isCoop: true,
-                isCompetitive: false,
-                favorite: false,
-                lastPlayedAt: '2025-08-02',
-            },
-        ] as Game[],
+        genres: [] as Genre[],
+        games: [] as Game[],
+        isLoading: false,
+        error: null as string | null,
     }),
+    actions: {
+        async loadAll() {
+            this.isLoading = true
+            this.error = null
+            try {
+                const [genres, games] = await Promise.all([
+                    service.listGenres(),
+                    service.listGames(),
+                ])
+                this.genres = genres
+                this.games = games
+            } catch (e: any) {
+                this.error = e?.message || 'Failed to load games'
+            } finally {
+                this.isLoading = false
+            }
+        },
+        async createGame(payload: GameCreate) {
+            const created = await service.createGame(payload)
+            this.games.unshift(created)
+            return created
+        },
+    },
 })

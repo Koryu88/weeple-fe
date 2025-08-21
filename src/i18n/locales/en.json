@@ -16,5 +16,49 @@
       "subtitle": "Oops! The page you’re looking for doesn’t exist.",
       "backHome": "Back to Home"
     }
+  },
+  "library": {
+    "title": "Library",
+    "favorite": "Favorite",
+    "showFilters": "Show filters",
+    "hideFilters": "Hide filters",
+    "addGame": "Add game",
+    "filters": "Filters",
+    "clearAll": "Clear all",
+    "searchByName": "Search by name…",
+    "results": {
+      "zero": "No results",
+      "one": "1 result",
+      "other": "{count} results"
+    },
+    "onlyFavorites": "Only favorites",
+    "onlyFavoritesHint": "Show only games marked as favorite",
+    "onlyOneShot": "Only one‑shot",
+    "onlyOneShotHint": "Filter one‑shot games",
+    "playersMax": "Players max",
+    "difficulty": "Difficulty",
+    "difficulties": {
+      "easy": "Easy",
+      "medium": "Medium",
+      "hard": "Hard"
+    },
+    "durationMax": "Max duration (min)",
+    "minRating": "Minimum rating",
+    "genre": "Genre",
+    "mode": "Mode",
+    "any": "Any",
+    "coop": "Co‑op",
+    "competitive": "Competitive",
+    "age": "Age",
+    "clearAges": "Clear ages",
+    "duration": "Duration",
+    "players": "Players",
+    "rating": "Rating",
+    "oneShot": "One-shot",
+    "lastPlayed": "Last played"
+  },
+  "common": {
+    "yes": "Yes",
+    "no": "No"
   }
 }

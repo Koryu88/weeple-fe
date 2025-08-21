@@ -7,7 +7,10 @@ export interface IGamesService {
 }
 
 export class ApiGamesService implements IGamesService {
-    constructor(private baseUrl: string) {}
+    private readonly baseUrl: string
+    constructor(baseUrl: string) {
+        this.baseUrl = baseUrl
+    }
 
     async listGames(): Promise<Game[]> {
         const res = await fetch(`${this.baseUrl}/games`)
