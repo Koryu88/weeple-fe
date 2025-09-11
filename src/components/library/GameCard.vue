@@ -35,9 +35,14 @@ const props = defineProps<{
     </div>
 
     <!-- Right content -->
-    <div class="flex flex-1 flex-col">
-      <header class="mb-1 flex items-start justify-between gap-2">
-        <h3 class="text-base font-semibold text-zinc-100 truncate">{{ game.name }}</h3>
+    <div class="flex flex-1 flex-col min-w-0">
+      <!-- HEADER: titolo + badge preferito (wrap su mobile) -->
+      <header class="mb-1 flex flex-wrap items-start gap-2">
+        <h3 class="text-base font-semibold text-zinc-100 truncate min-w-0 grow">
+          {{ game.name }}
+          <RatingStars class="md:hidden" :model-value="game.rating" readonly size="sm" />
+        </h3>
+
         <span
             v-if="game.favorite"
             class="shrink-0 rounded-md bg-pink-600/20 px-2 py-0.5 text-xs text-pink-300"
@@ -46,40 +51,54 @@ const props = defineProps<{
         </span>
       </header>
 
-      <div class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-zinc-300 md:grid-cols-3">
-        <div>{{ t('library.age') }}: {{ game.minAge }}+</div>
-        <div>{{ t('library.players') }}: {{ game.playersMin }}–{{ game.playersMax }}</div>
-        <div>
+      <div
+          class="col-span-2 md:col-span-1 flex flex-wrap items-center gap-1 min-w-0 mb-2 hidden md:block"
+      >
+        <span class="mr-2">{{ t('library.rating') }}:</span>
+        <span class="inline-block">
+            <RatingStars :model-value="game.rating" readonly size="sm" />
+          </span>
+      </div>
+
+      <!-- DETTAGLI: griglia a 2 col su mobile, 3 da md: -->
+      <div
+          class="grid grid-cols-2 gap-x-4 gap-y-1 text-xs text-zinc-300 md:grid-cols-3"
+      >
+        <div class="min-w-0">{{ t('library.age') }}: {{ game.minAge }}+</div>
+
+        <div class="min-w-0">
+          {{ t('library.players') }}: {{ game.playersMin }}–{{ game.playersMax }}
+        </div>
+
+        <div class="min-w-0">
           {{ t('library.difficulty') }}:
           {{ t('library.difficulties.' + game.difficulty) }}
         </div>
 
-        <!-- DURATA (sopra rating) -->
-        <div>
-          {{ t('library.duration') }}: {{ game.durationMins }} {{ t('library.min') }}
+        <div class="min-w-0">
+          {{ t('library.duration') }}: {{ game.durationMins }}
         </div>
 
-        <!-- RATING -->
-        <div class="flex items-center gap-1">
-          {{ t('library.rating') }}:
-          <RatingStars :model-value="game.rating" readonly size="sm" />
+        <!-- RATING: span piena riga su mobile per evitare sovrapposizioni -->
+
+
+        <div class="min-w-0">
+          {{ t('library.genre') }}: {{ genreName || '—' }}
         </div>
 
-        <div>{{ t('library.genre') }}: {{ genreName || '—' }}</div>
-
-        <div>
+        <div class="min-w-0">
           {{ t('library.mode') }}:
           <span v-if="game.isCoop">{{ t('library.coop') }}</span>
           <span v-else-if="game.isCompetitive">{{ t('library.competitive') }}</span>
           <span v-else>—</span>
         </div>
 
-        <div>
+        <div class="min-w-0">
           {{ t('library.oneShot') }}:
           {{ game.isOneShot ? t('common.yes') : t('common.no') }}
         </div>
 
-        <div>
+        <div class="min-w-0">
           {{ t('library.lastPlayed') }}:
           {{ game.lastPlayedAt ? new Date(game.lastPlayedAt).toLocaleDateString() : '—' }}
         </div>
