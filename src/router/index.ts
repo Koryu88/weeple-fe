@@ -17,6 +17,48 @@ const routes: RouteRecordRaw[] = [
                 meta: { titleKey: 'pages.library', chrome: true },
             },
             {
+                path: 'library/:id',
+                name: 'game-detail',
+                component: () => import('@/pages/GameDetailPage.vue'),
+                meta: { titleKey: 'pages.gameDetail', chrome: true },
+            },
+            {
+                path: 'library/new',
+                name: 'game-new',
+                component: () => import('@/pages/GameFormPage.vue'),
+                meta: { titleKey: 'pages.newGame', chrome: true },
+            },
+            {
+                path: 'library/:id/edit',
+                name: 'game-edit',
+                component: () => import('@/pages/GameFormPage.vue'),
+                meta: { titleKey: 'pages.editGame', chrome: true },
+            },
+            {
+                path: 'players',
+                name: 'players',
+                component: () => import('@/pages/PlayersPage.vue'),
+                meta: { titleKey: 'pages.players', chrome: true },
+            },
+            {
+                path: 'players/:id',
+                name: 'player-detail',
+                component: () => import('@/pages/PlayerDetailPage.vue'),
+                meta: { titleKey: 'pages.playerDetail', chrome: true },
+            },
+            {
+                path: 'teams',
+                name: 'teams',
+                component: () => import('@/pages/TeamsPage.vue'),
+                meta: { titleKey: 'pages.teams', chrome: true },
+            },
+            {
+                path: 'teams/:id',
+                name: 'team-detail',
+                component: () => import('@/pages/TeamDetailPage.vue'),
+                meta: { titleKey: 'pages.teamDetail', chrome: true },
+            },
+            {
                 path: 'stats',
                 name: 'stats',
                 component: () => import('@/pages/StatsPage.vue'),

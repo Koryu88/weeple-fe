@@ -7,13 +7,15 @@ import GameCard from '@/components/library/GameCard.vue'
 import UiSwitch from '@/components/ui/UiSwitch.vue'
 import { useGamesStore } from '@/stores/games'
 import { useI18n } from 'vue-i18n'
+import { useRouter } from 'vue-router'
 
 const store = useGamesStore()
 const { t } = useI18n()
-const showFilters = ref(true)
+const router = useRouter()
+const showFilters = ref(false)
 
 onMounted(() => {
-  if (!store.games.length) store.loadAll()
+  if (!store.games.length) store.fetchGames()
 })
 
 /** Toolbar/results text */
@@ -95,8 +97,7 @@ const filtered = computed(() => {
 })
 
 function onCreate() {
-  // TODO: open modal/route for create game
-  console.info('Create new game')
+  router.push({ name: 'game-new' });
 }
 
 function genreNameById(id?: string) {
@@ -127,7 +128,6 @@ function genreNameById(id?: string) {
       />
     </div>
 
-    <!-- Filters -->
     <!-- Filters -->
     <div class="mb-4">
       <!-- Toggle SEMPRE visibile -->

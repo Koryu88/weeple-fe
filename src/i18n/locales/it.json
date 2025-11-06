@@ -1,12 +1,16 @@
 {
   "menu": {
     "library": "Libreria",
+    "players": "Giocatori",
+    "teams": "Team",
     "stats": "Statistiche",
     "tools": "Utilità",
     "account": "Profilo"
   },
   "pages": {
     "library": "Libreria",
+    "players": "Giocatori",
+    "teams": "Team",
     "stats": "Statistiche",
     "tools": "Utilità",
     "account": "Profilo",
@@ -15,7 +19,16 @@
       "title": "Pagina non trovata",
       "subtitle": "Ops! La pagina che cerchi non esiste.",
       "backHome": "Torna alla Home"
-    }
+    },
+    "gameDetail": "Dettaglio gioco",
+    "playerDetail": "Dettaglio giocatore",
+    "teamDetail": "Dettaglio team"
+  },
+  "players": {
+    "addPlayer": "Nuovo giocatore"
+  },
+  "teams": {
+    "addTeam": "Nuovo team"
   },
   "library": {
     "title": "Libreria",
@@ -57,7 +70,25 @@
     "oneShot": "One-shot",
     "lastPlayed": "Ultima partita"
   },
-  "common": {
+  "game": {
+    "notFound": "Gioco non trovato.",
+    "backToLibrary": "Torna alla libreria",
+    "features": "Caratteristiche",
+    "instructions": "Istruzioni (PDF)",
+    "searchInPdf": "Cerca nelle istruzioni...",
+    "pdfViewerPlaceholder": "Visualizzatore PDF (prossimamente)",
+    "askTheAi": "Chiedi all'AI",
+    "aiPlaceholder": "Fai una domanda sulle regole...",
+    "plays": "Partite giocate",
+    "addPlay": "Aggiungi partita",
+    "noPlaysYet": "Nessuna partita registrata.",
+    "description": "Descrizione"
+  },
+  "general": {
+    "loading": "Caricamento...",
+    "search": "Cerca",
+    "send": "Invia",
+    "edit": "Modifica",
     "yes": "Sì",
     "no": "No"
   }

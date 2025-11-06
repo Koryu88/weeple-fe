@@ -7,17 +7,18 @@ defineOptions({ inheritAttrs: false })
 
 const { t } = useI18n()
 
-const props = defineProps<{
+defineProps<{
   game: Game
   genreName?: string
 }>()
 </script>
 
 <template>
-  <article
-      v-bind="$attrs"
-      class="h-full flex rounded-2xl border border-zinc-800 bg-zinc-900/60 p-3 gap-3"
-  >
+<router-link
+    :to="{ name: 'game-detail', params: { id: game.id } }"
+    v-bind="$attrs"
+    class="h-full flex rounded-2xl border border-zinc-800 bg-zinc-900/60 p-3 gap-3 transition-colors hover:border-indigo-600/50"
+>
     <!-- Cover -->
     <div class="flex-shrink-0">
       <img
@@ -95,7 +96,7 @@ const props = defineProps<{
 
         <div class="min-w-0">
           {{ t('library.oneShot') }}:
-          {{ game.isOneShot ? t('common.yes') : t('common.no') }}
+          {{ game.isOneShot ? t('general.yes') : t('general.no') }}
         </div>
 
         <div class="min-w-0">
@@ -107,5 +108,5 @@ const props = defineProps<{
       <!-- Footer (bottoni/azioni se servono) -->
       <footer class="mt-auto pt-2"></footer>
     </div>
-  </article>
+  </router-link>
 </template>

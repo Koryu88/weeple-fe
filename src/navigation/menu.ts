@@ -3,6 +3,8 @@ import {
     mdiChartLine,
     mdiDiceD20,
     mdiAccountCircle,
+    mdiAccount,
+    mdiAccountGroup,
 } from '@mdi/js'
 
 export interface MenuEntry {
@@ -17,7 +19,7 @@ export const MENU_ITEMS: MenuEntry[] = [
         iconPath: mdiLibraryShelves,
         labelKey: 'menu.library',
         to: '/library',
-        activeMatch: '^/library/?$',
+        activeMatch: '^/library', // Evidenzia anche le sottopagine
     },
     {
         iconPath: mdiChartLine,
@@ -36,5 +38,17 @@ export const MENU_ITEMS: MenuEntry[] = [
         labelKey: 'menu.account',
         to: '/account',
         activeMatch: '^/account',
+    },
+    {
+        iconPath: mdiAccount,
+        labelKey: 'menu.players',
+        to: '/players',
+        activeMatch: '^/players',
+    },
+    {
+        iconPath: mdiAccountGroup,
+        labelKey: 'menu.teams',
+        to: '/teams',
+        activeMatch: '^/teams',
     },
 ]

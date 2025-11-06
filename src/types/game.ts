@@ -5,22 +5,25 @@ export interface Genre {
     name: string
 }
 
-export interface Game {
-    id: string
+export interface GameCreate {
     name: string
-    coverUrl?: string
     minAge: number
     playersMin: number
     playersMax: number
     difficulty: Difficulty
-    rating: number          // 1..5
     durationMins: number    // single session
     genreId: string         // reference to existing genres
     isOneShot: boolean
     isCoop: boolean
     isCompetitive: boolean
-    favorite: boolean
-    lastPlayedAt?: string   // ISO date
+    coverUrl?: string
+    description?: string
 }
 
-export type GameCreate = Omit<Game, 'id'>
+export interface Game extends GameCreate {
+    id: string
+    rating: number // 0..5
+    favorite: boolean
+    lastPlayedAt?: string // YYYY-MM-DD
+    description?: string
+}
