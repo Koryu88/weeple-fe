@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { mdiAccountPlus, mdiClose } from '@mdi/js'
+import { mdiClose } from '@mdi/js'
 import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 
 const emit = defineEmits(['close', 'save'])

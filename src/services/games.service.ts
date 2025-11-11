@@ -67,6 +67,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: true,
             favorite: true,
             lastPlayedAt: '2025-06-15',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g2',
@@ -84,6 +85,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: false,
             favorite: false,
             lastPlayedAt: '2025-07-08',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g3',
@@ -101,6 +103,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: false,
             favorite: false,
             lastPlayedAt: '2025-08-02',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g4',
@@ -118,6 +121,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: true,
             favorite: true,
             lastPlayedAt: '2025-09-10',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g5',
@@ -135,6 +139,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: true,
             favorite: false,
             lastPlayedAt: '2025-10-01',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g6',
@@ -152,6 +157,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: true,
             favorite: false,
             lastPlayedAt: '2025-10-22',
+            manualUrl: '/sample.pdf'
         },
         {
             id: 'g7',
@@ -169,6 +175,7 @@ export class MockGamesService implements IGamesService {
             isCompetitive: false,
             favorite: false,
             lastPlayedAt: '2025-11-05',
+            manualUrl: '/sample.pdf'
         },
     ]
 
@@ -189,6 +196,7 @@ export class MockGamesService implements IGamesService {
             favorite: false,
             lastPlayedAt: undefined,
             coverUrl: 'https://picsum.photos/seed/new/400/280',
+            manualUrl: payload.manualUrl || '/sample.pdf'
         }
         this.games.unshift(newGame)
         return Promise.resolve(structuredClone(newGame))

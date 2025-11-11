@@ -8,6 +8,8 @@ import BaseAvatar from '@/components/ui/BaseAvatar.vue';
 import RatingStars from '@/components/ui/RatingStars.vue';
 import BarChart from '@/components/charts/BarChart.vue';
 import type { ChartData, ChartOptions } from 'chart.js';
+import type { Team } from '@/types/player'
+import type { Player } from '@/types/player'
 
 const playsStore = usePlaysStore();
 const gamesStore = useGamesStore();
@@ -45,6 +47,8 @@ const latestActiveTeams = computed(() => {
     .map(teamId => teamsStore.getTeamById(teamId));
 });
 
+const latestActiveTeamsFiltered = computed(() => latestActiveTeams.value.filter((t): t is Team => !!t))
+
 const latestActivePlayers = computed(() => {
   const playerPlayDates: { [key: string]: string } = {};
   playsStore.plays.forEach(play => {
@@ -63,6 +67,8 @@ const latestActivePlayers = computed(() => {
     .slice(0, 5)
     .map(playerId => playersStore.getPlayerById(playerId));
 });
+
+const latestActivePlayersFiltered = computed(() => latestActivePlayers.value.filter((p): p is Player => !!p))
 
 const gamePlayCounts = computed(() => {
   const counts: { [key: string]: number } = {};
@@ -214,11 +220,11 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
         <!-- General Stats -->
         <div class="bg-zinc-900/60 p-4 rounded-lg">
             <h2 class="text-xl font-semibold mb-4">Statistiche Generali</h2>
-            <div v-if="mostActivePlayer" class="flex items-center justify-between py-2">
+            <div v-if="mostActivePlayer?.player" class="flex items-center justify-between py-2">
                 <span>Giocatore più attivo:</span>
                 <div class="flex items-center gap-2">
-                    <BaseAvatar :seed="mostActivePlayer.player?.name" type="bottts-neutral" class="w-8 h-8 rounded-full" />
-                    <span class="font-semibold">{{ mostActivePlayer.player?.name }} ({{ mostActivePlayer.count }} partite)</span>
+                    <BaseAvatar :seed="mostActivePlayer.player.name" type="bottts-neutral" class="w-8 h-8 rounded-full" />
+                    <span class="font-semibold">{{ mostActivePlayer.player.name }} ({{ mostActivePlayer.count }} partite)</span>
                 </div>
             </div>
             <div v-if="favoriteGenre" class="flex items-center justify-between py-2">
@@ -245,7 +251,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
         <div>
             <h2 class="text-xl font-semibold mb-4">Team Recenti</h2>
             <div class="space-y-3">
-                <div v-for="team in latestActiveTeams" :key="team.id" class="rounded-lg bg-zinc-900/60 border border-zinc-800 p-3 flex items-center gap-3">
+                <div v-for="team in latestActiveTeamsFiltered" :key="team.id" class="rounded-lg bg-zinc-900/60 border border-zinc-800 p-3 flex items-center gap-3">
                     <BaseAvatar :seed="team.name" type="identicon" class="w-10 h-10 rounded-full" />
                     <span class="font-semibold">{{ team.name }}</span>
                 </div>
@@ -256,7 +262,7 @@ const chartOptions = computed<ChartOptions<'bar'>>(() => ({
         <div>
             <h2 class="text-xl font-semibold mb-4">Giocatori Recenti</h2>
             <div class="space-y-3">
-                <div v-for="player in latestActivePlayers" :key="player.id" class="rounded-lg bg-zinc-900/60 border border-zinc-800 p-3 flex items-center gap-3">
+                <div v-for="player in latestActivePlayersFiltered" :key="player.id" class="rounded-lg bg-zinc-900/60 border border-zinc-800 p-3 flex items-center gap-3">
                     <BaseAvatar :seed="player.name" type="bottts-neutral" class="w-10 h-10 rounded-full" />
                     <span class="font-semibold">{{ player.name }}</span>
                 </div>

@@ -1,7 +1,4 @@
 import type { Play } from '@/types/play';
-import type { Game } from '@/types/game';
-import type { Team } from '@/types/player';
-import { MockGamesService } from './games.service';
 
 export interface IPlaysService {
     listPlays(): Promise<Play[]>;
@@ -25,4 +22,3 @@ export class MockPlaysService implements IPlaysService {
         return structuredClone(this.plays);
     }
 }
-

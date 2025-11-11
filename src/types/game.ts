@@ -18,6 +18,7 @@ export interface GameCreate {
     isCompetitive: boolean
     coverUrl?: string
     description?: string
+    manualUrl?: string // URL del manuale PDF
 }
 
 export interface Game extends GameCreate {
@@ -26,4 +27,5 @@ export interface Game extends GameCreate {
     favorite: boolean
     lastPlayedAt?: string // YYYY-MM-DD
     description?: string
+    // manualUrl eredita da GameCreate
 }

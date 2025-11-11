@@ -1,5 +1,5 @@
 import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
+import { ref } from 'vue';
 import type { Play } from '@/types/play';
 import { MockPlaysService } from '@/services/plays.service';
 
@@ -16,4 +16,3 @@ export const usePlaysStore = defineStore('plays', () => {
         fetchPlays,
     };
 });
-

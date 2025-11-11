@@ -2,9 +2,9 @@
 import { ref, onMounted, computed } from 'vue';
 import { useRoute, useRouter } from 'vue-router';
 import { useGamesStore } from '@/stores/games';
-import type { Game, GameCreate, Genre } from '@/types/game';
+import type { GameCreate, Genre } from '@/types/game';
 import UiSwitch from '@/components/ui/UiSwitch.vue';
-import { mdiChevronLeft, mdiUpload } from '@mdi/js';
+import { mdiChevronLeft } from '@mdi/js';
 import IconMdiButton from '@/components/ui/IconMdiButton.vue';
 
 const route = useRoute();
@@ -14,7 +14,7 @@ const gamesStore = useGamesStore();
 const gameId = route.params.id as string | undefined;
 const isEditMode = computed(() => !!gameId);
 
-const form = ref<Partial<Game>>({
+const form = ref<GameCreate & { manualUrl?: string }>({
     name: '',
     minAge: 8,
     playersMin: 1,
@@ -27,6 +27,7 @@ const form = ref<Partial<Game>>({
     isOneShot: true,
     coverUrl: '',
     description: '',
+    manualUrl: '',
 });
 
 const coverImageFile = ref<File | null>(null);
@@ -34,10 +35,11 @@ const instructionsPdfFile = ref<File | null>(null);
 
 onMounted(async () => {
     if (!gamesStore.genres.length) {
-        await gamesStore.fetchGames(); // Assicura che generi e giochi siano caricati
+        await gamesStore.fetchGames();
     }
     if (isEditMode.value && gameId) {
-        const gameData = gamesStore.getGameById(gameId) || await gamesStore.loadGameById(gameId);
+        await gamesStore.loadGameById(gameId);
+        const gameData = gamesStore.getGameById(gameId);
         if (gameData) {
             form.value = { ...gameData };
         }
@@ -48,44 +50,37 @@ onMounted(async () => {
 });
 
 const genres = computed<Genre[]>(() => gamesStore.genres);
-const difficulties = ['easy', 'medium', 'hard'];
+const difficulties: GameCreate['difficulty'][] = ['easy', 'medium', 'hard'];
 
 function handleFileUpload(event: Event, type: 'cover' | 'pdf') {
     const target = event.target as HTMLInputElement;
     if (target.files && target.files[0]) {
         if (type === 'cover') {
             coverImageFile.value = target.files[0];
-            form.value.coverUrl = ''; // Pulisce l'URL se viene caricato un file
+            form.value.coverUrl = '';
         } else {
             instructionsPdfFile.value = target.files[0];
+            // placeholder: salvo solo nome file localmente
+            form.value.manualUrl = `/sample.pdf`;
         }
     }
 }
 
 async function handleSubmit() {
-    // In un'app reale, qui gestiresti l'upload dei file
-    if (coverImageFile.value) {
-        console.log('Uploading cover image:', coverImageFile.value.name);
-        // Esempio: form.value.coverUrl = await uploadFileAndGetURL(coverImageFile.value);
-    }
-    if (instructionsPdfFile.value) {
-        console.log('Uploading instructions PDF:', instructionsPdfFile.value.name);
-        // Esempio: form.value.instructionsUrl = await uploadFileAndGetURL(instructionsPdfFile.value);
-    }
-
     const payload: GameCreate = {
-        name: form.value.name!,
-        minAge: form.value.minAge!,
-        playersMin: form.value.playersMin!,
-        playersMax: form.value.playersMax!,
-        durationMins: form.value.durationMins!,
-        difficulty: form.value.difficulty!,
-        genreId: form.value.genreId!,
-        isCoop: form.value.isCoop!,
-        isCompetitive: form.value.isCompetitive!,
-        isOneShot: form.value.isOneShot!,
-        coverUrl: form.value.coverUrl,
-        description: form.value.description,
+        name: form.value.name,
+        minAge: form.value.minAge,
+        playersMin: form.value.playersMin,
+        playersMax: form.value.playersMax,
+        durationMins: form.value.durationMins,
+        difficulty: form.value.difficulty,
+        genreId: form.value.genreId,
+        isCoop: form.value.isCoop,
+        isCompetitive: form.value.isCompetitive,
+        isOneShot: form.value.isOneShot,
+        coverUrl: form.value.coverUrl || undefined,
+        description: form.value.description || undefined,
+        manualUrl: form.value.manualUrl || undefined,
     };
 
     try {
@@ -180,15 +175,21 @@ async function handleSubmit() {
             </div>
 
             <!-- Toggles -->
-            <div class="flex items-center space-x-8">
+            <div class="flex items-center flex-wrap gap-6">
                 <UiSwitch v-model="form.isCoop" label="Cooperativo" />
                 <UiSwitch v-model="form.isCompetitive" label="Competitivo" />
                 <UiSwitch v-model="form.isOneShot" label="One-Shot" />
             </div>
 
-            <!-- Instructions -->
+            <!-- Manual URL -->
             <div>
-                <label class="block text-sm font-medium text-zinc-300">Manuale di istruzioni (PDF)</label>
+                <label for="manualUrl" class="block text-sm font-medium text-zinc-300">Manuale (URL PDF)</label>
+                <input type="url" id="manualUrl" v-model="form.manualUrl" placeholder="https://example.com/manual.pdf" class="mt-1 block w-full bg-zinc-800 border-zinc-700 rounded-md shadow-sm">
+            </div>
+
+            <!-- Instructions upload -->
+            <div>
+                <label class="block text-sm font-medium text-zinc-300">Manuale di istruzioni (Upload PDF)</label>
                 <label for="pdfFile" class="mt-1 cursor-pointer flex justify-center items-center gap-2 w-full px-6 py-3 border-2 border-zinc-700 border-dashed rounded-md">
                     <svg class="w-6 h-6 text-zinc-500" fill="none" stroke="currentColor" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M7 16a4 4 0 01-4-4V7a4 4 0 014-4h1.586a1 1 0 01.707.293l4.414 4.414a1 1 0 01.293.707V16a4 4 0 01-4 4H7z" /><path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 11v6m-3-3h6" /></svg>
                     <span class="text-sm text-zinc-400">{{ instructionsPdfFile ? instructionsPdfFile.name : 'Clicca per caricare un PDF' }}</span>

@@ -2,7 +2,7 @@
 import { ref } from 'vue'
 import type { Team, Player } from '@/types/player'
 import CreateTeamModal from '@/components/player/CreateTeamModal.vue'
-import { mdiPlus, mdiAccountGroup, mdiTrashCan } from '@mdi/js'
+import { mdiPlus, mdiTrashCan } from '@mdi/js'
 import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 import BaseAvatar from '@/components/ui/BaseAvatar.vue'
 import { useI18n } from 'vue-i18n'

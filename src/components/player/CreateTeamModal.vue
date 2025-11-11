@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref } from 'vue'
-import { mdiAccountGroup, mdiClose, mdiPlus } from '@mdi/js'
+import { mdiClose, mdiPlus } from '@mdi/js'
 import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 import type { Player } from '@/types/player'
 import CreatePlayerModal from './CreatePlayerModal.vue'

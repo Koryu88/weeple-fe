@@ -2,7 +2,6 @@
 import { ref } from 'vue'
 import { useI18n } from 'vue-i18n'
 import { mdiRobot, mdiClose, mdiSend } from '@mdi/js'
-import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 
 const props = defineProps<{
   gameId: string

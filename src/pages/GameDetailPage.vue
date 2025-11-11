@@ -8,6 +8,7 @@ import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 import RatingStars from '@/components/ui/RatingStars.vue'
 import AiHelper from '@/components/game/AiHelper.vue'
 import AddPlayModal from '@/components/play/AddPlayModal.vue'
+import ManualPdfViewer from '@/components/game/ManualPdfViewer.vue'
 
 const store = useGamesStore()
 const route = useRoute()
@@ -40,7 +41,7 @@ function goBack() {
 }
 
 function searchInPdf() {
-  // TODO: Implementare ricerca nel PDF
+  // La ricerca viene gestita internamente dal componente ManualPdfViewer
   console.log('Ricerca nel PDF:', pdfQuery.value)
 }
 
@@ -115,26 +116,6 @@ function handlePlaySaved(playData: any) {
             <h2 class="mb-2 text-lg font-semibold">{{ t('game.description') }}</h2>
             <p class="text-zinc-300 whitespace-pre-wrap">{{ game.description }}</p>
         </div>
-
-        <!-- Istruzioni PDF -->
-        <div class="mb-6 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
-          <h2 class="mb-3 flex items-center gap-2 text-lg font-semibold">
-            <svg class="h-6 w-6" viewBox="0 0 24 24"><path :d="mdiFilePdfBox" fill="currentColor" /></svg>
-            {{ t('game.instructions') }}
-          </h2>
-          <div class="flex gap-2">
-            <input
-              v-model="pdfQuery"
-              :placeholder="t('game.searchInPdf')"
-              class="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
-            />
-            <IconMdiButton :icon-path="mdiMagnify" @click="searchInPdf" :label="t('general.search')" />
-          </div>
-          <div class="mt-4 h-96 rounded-lg border border-zinc-700 bg-zinc-950 p-2">
-            <!-- Qui andrà il visualizzatore PDF -->
-            <p class="text-center text-zinc-500">{{ t('game.pdfViewerPlaceholder') }}</p>
-          </div>
-        </div>
       </div>
 
       <!-- Colonna laterale con giocate -->
@@ -156,6 +137,26 @@ function handlePlaySaved(playData: any) {
           </div>
         </div>
       </div>
+
+      <!-- Istruzioni PDF a tutta larghezza -->
+      <div class="md:col-span-3 rounded-2xl border border-zinc-800 bg-zinc-900/60 p-4">
+        <h2 class="mb-3 flex items-center gap-2 text-lg font-semibold">
+          <svg class="h-6 w-6" viewBox="0 0 24 24"><path :d="mdiFilePdfBox" fill="currentColor" /></svg>
+          {{ t('game.instructions') }}
+        </h2>
+        <div class="flex flex-col gap-3 md:flex-row md:items-center">
+          <input
+            v-model="pdfQuery"
+            :placeholder="t('game.searchInPdf')"
+            class="w-full rounded-xl border border-zinc-700 bg-zinc-950 px-3 py-2 text-sm"
+          />
+          <IconMdiButton :icon-path="mdiMagnify" @click="searchInPdf" :label="t('general.search')" class="shrink-0" />
+        </div>
+        <div class="mt-4 h-[32rem] rounded-lg border border-zinc-700 bg-zinc-950 p-2">
+          <ManualPdfViewer :src="game.manualUrl || '/sample.pdf'" :query="pdfQuery" />
+        </div>
+      </div>
+
     </div>
 
     <AiHelper v-if="game.id" :game-id="game.id" :game-name="game.name" />

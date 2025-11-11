@@ -2,7 +2,7 @@
 import { ref, computed } from 'vue'
 import { useRoute } from 'vue-router'
 import type { Team, Player } from '@/types/player'
-import { mdiChevronLeft, mdiAccountGroup } from '@mdi/js'
+import { mdiChevronLeft } from '@mdi/js'
 import IconMdiButton from '@/components/ui/IconMdiButton.vue'
 import BaseAvatar from '@/components/ui/BaseAvatar.vue'
 import RatingStars from '@/components/ui/RatingStars.vue'

@@ -6,9 +6,7 @@ import RatingStars from '@/components/ui/RatingStars.vue'
 import type { Team } from '@/types/player'
 import CreateTeamModal from '@/components/player/CreateTeamModal.vue'
 
-const props = defineProps<{
-  gameName: string
-}>()
+defineProps<{ gameName: string }>()
 
 const emit = defineEmits(['close', 'save'])
 
@@ -75,4 +73,3 @@ function handleTeamCreated(newTeam: Team) {
 
   <CreateTeamModal v-if="showCreateTeamModal" @close="showCreateTeamModal = false" @save="handleTeamCreated" />
 </template>
-
