@@ -1,9 +1,11 @@
 <script setup lang="ts">
-import { ref, watch, computed, watchEffect } from 'vue'
+import { ref, watch, computed, watchEffect, onMounted, onUnmounted, nextTick } from 'vue'
 import { VuePDF, usePDF } from '@tato30/vue-pdf'
 
 interface Props { src: string; query?: string }
 const props = defineProps<Props>()
+
+const container = ref<HTMLDivElement | null>(null)
 
 // Viewer state
 const page = ref(1)
@@ -14,18 +16,48 @@ const { pdf, pages } = usePDF(props.src)
 const loading = ref(true)
 const loadError = ref<string | null>(null)
 
-watchEffect(() => {
+async function fitWidth() {
+  if (!pdf.value || !container.value) return
+  const pdfDoc = await getPdfDoc()
+  if (!pdfDoc) return
+
+  try {
+    const pageProxy = await pdfDoc.getPage(1) // Use first page for dimensions
+    const viewport = pageProxy.getViewport({ scale: 1 })
+
+    const containerWidth = container.value.clientWidth
+    // Apply a small reduction to avoid overflow
+    const newScale = (containerWidth / viewport.width) * 0.99
+    scale.value = newScale
+  } catch (e) {
+    console.error("Failed to fit to width", e)
+  }
+}
+
+watchEffect(async () => {
   if (pdf.value) {
     const task: any = pdf.value
-    if (task?.promise) {
-      task.promise.then(() => { loading.value = false }).catch((e: any) => {
-        loadError.value = e?.message || 'Errore caricamento PDF'
-        loading.value = false
-      })
-    } else {
+    try {
+      if (task?.promise) {
+        await task.promise
+      }
+      loading.value = false
+      // Ensure container is rendered and then fit width
+      await nextTick()
+      fitWidth()
+    } catch (e: any) {
+      loadError.value = e?.message || 'Errore caricamento PDF'
       loading.value = false
     }
   }
+})
+
+onMounted(() => {
+  window.addEventListener('resize', fitWidth)
+})
+
+onUnmounted(() => {
+  window.removeEventListener('resize', fitWidth)
 })
 
 function nextPage() { if (page.value < pages.value) page.value++ }
@@ -62,6 +94,7 @@ async function getPdfDoc(): Promise<any | null> {
   if (task?.promise) return task.promise
   return task
 }
+
 
 async function ensurePageText(pageNumber: number) {
   if (textCache.value[pageNumber]) return
@@ -254,7 +287,7 @@ watch(pdf, () => { if (currentQuery.value) buildIndex() })
       <button v-if="flatMatches.length" @click="nextMatch" class="rounded bg-zinc-800 px-2 py-1">▶</button>
       <span v-if="loadError" class="px-2 py-1 text-red-400">{{ loadError }}</span>
     </div>
-    <div class="flex-1 overflow-auto rounded bg-zinc-950 p-1 relative">
+    <div ref="container" class="flex-1 overflow-auto rounded bg-zinc-950 p-1 relative">
       <VuePDF v-if="pdf && !loading && !loadError" :pdf="pdf" :page="page" :scale="scale" :rotation="rotation" />
       <p v-else-if="loading" class="p-4 text-center text-zinc-500">Caricamento...</p>
       <p v-else-if="loadError" class="p-4 text-center text-red-400">{{ loadError }}</p>
