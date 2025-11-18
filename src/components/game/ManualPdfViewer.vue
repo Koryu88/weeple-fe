@@ -5,6 +5,10 @@ import { VuePDF, usePDF } from '@tato30/vue-pdf'
 interface Props { src: string; query?: string }
 const props = defineProps<Props>()
 
+// --- NUOVO REF PER IL FULLSCREEN ---
+const rootContainer = ref<HTMLElement | null>(null) // <--- Riferimento al div principale
+const isFullscreen = ref(false)                     // <--- Stato del fullscreen
+
 const container = ref<HTMLDivElement | null>(null)
 
 // Viewer state
@@ -16,17 +20,39 @@ const { pdf, pages } = usePDF(props.src)
 const loading = ref(true)
 const loadError = ref<string | null>(null)
 
+// --- LOGICA FULLSCREEN ---
+function toggleFullscreen() {
+  if (!rootContainer.value) return
+
+  if (!document.fullscreenElement) {
+    // Entra in fullscreen
+    rootContainer.value.requestFullscreen().catch(err => {
+      console.error(`Error enabling fullscreen mode: ${err.message}`);
+    })
+  } else {
+    // Esci da fullscreen
+    document.exitFullscreen()
+  }
+}
+
+function onFullscreenChange() {
+  // Aggiorna lo stato (utile se l'utente preme ESC)
+  isFullscreen.value = !!document.fullscreenElement
+  // Ricalcola la larghezza dopo un breve delay per permettere al browser di ridisegnare
+  setTimeout(() => fitWidth(), 200)
+}
+// -------------------------
+
 async function fitWidth() {
   if (!pdf.value || !container.value) return
   const pdfDoc = await getPdfDoc()
   if (!pdfDoc) return
 
   try {
-    const pageProxy = await pdfDoc.getPage(1) // Use first page for dimensions
+    const pageProxy = await pdfDoc.getPage(1)
     const viewport = pageProxy.getViewport({ scale: 1 })
 
     const containerWidth = container.value.clientWidth
-    // Apply a small reduction to avoid overflow
     const newScale = (containerWidth / viewport.width) * 0.99
     scale.value = newScale
   } catch (e) {
@@ -42,7 +68,6 @@ watchEffect(async () => {
         await task.promise
       }
       loading.value = false
-      // Ensure container is rendered and then fit width
       await nextTick()
       fitWidth()
     } catch (e: any) {
@@ -54,10 +79,12 @@ watchEffect(async () => {
 
 onMounted(() => {
   window.addEventListener('resize', fitWidth)
+  document.addEventListener('fullscreenchange', onFullscreenChange) // <--- Listener aggiunto
 })
 
 onUnmounted(() => {
   window.removeEventListener('resize', fitWidth)
+  document.removeEventListener('fullscreenchange', onFullscreenChange) // <--- Listener rimosso
 })
 
 function nextPage() { if (page.value < pages.value) page.value++ }
@@ -66,10 +93,10 @@ function zoomIn() { scale.value = Math.min(scale.value + 0.1, 3) }
 function zoomOut() { scale.value = Math.max(scale.value - 0.1, 0.5) }
 function rotate() { rotation.value = (rotation.value + 90) % 360 }
 
-// --- Ricerca multi-pagina con bounding boxes ---
+// --- Ricerca multi-pagina con bounding boxes (INVARIATO) ---
 const currentQuery = computed(() => props.query?.trim() || '')
 const indexing = ref(false)
-const textCache = ref<Record<number, any>>({}) // page -> textContent
+const textCache = ref<Record<number, any>>({})
 
 interface Occurrence { start: number; length: number }
 interface RawMatchItem {
@@ -78,7 +105,7 @@ interface RawMatchItem {
   width: number;
   height: number;
   text: string;
-  occurrences: Occurrence[]; // occorrenze della query dentro item.str
+  occurrences: Occurrence[];
 }
 interface BoxMatch {
   page: number; x: number; y: number; w: number; h: number; text: string; occurrenceIndex: number; globalIndex: number;
@@ -94,7 +121,6 @@ async function getPdfDoc(): Promise<any | null> {
   if (task?.promise) return task.promise
   return task
 }
-
 
 async function ensurePageText(pageNumber: number) {
   if (textCache.value[pageNumber]) return
@@ -117,7 +143,7 @@ function findOccurrences(haystack: string, needle: string): Occurrence[] {
     idx = lowerHay.indexOf(lowerNeedle, idx)
     if (idx === -1) break
     out.push({ start: idx, length: lowerNeedle.length })
-    idx += lowerNeedle.length // salto oltre la occorrenza trovata
+    idx += lowerNeedle.length
   }
   return out
 }
@@ -133,7 +159,7 @@ async function buildIndex() {
   indexing.value = true
   const localToken = ++buildToken
   for (let p = 1; p <= pages.value; p++) {
-    if (localToken !== buildToken) return // abort se query cambiata
+    if (localToken !== buildToken) return
     await ensurePageText(p)
     const cache = textCache.value[p]
     if (!cache) continue
@@ -154,7 +180,6 @@ async function buildIndex() {
   }
   indexing.value = false
   generateFlatMatches()
-  // Vai alla pagina del primo match
   if (flatMatches.value.length) {
     const first = flatMatches.value[0]
     if (page.value !== first.page) page.value = first.page
@@ -206,12 +231,12 @@ async function drawHighlightsForPage() {
   host.appendChild(overlay)
   const pageRaw = rawMatches.value.filter(r => r.page === page.value)
   let globalCounter = 0
-  const fudgeY = -10 // piccolo aggiustamento verso l'alto
+  const fudgeY = -10
   pageRaw.forEach(rm => {
     const t = rm.transform
     const fontHeight = Math.abs(t[3]) || rm.height
     const baseX = t[4]
-    const baselineY = t[5] // baseline reale
+    const baselineY = t[5]
     const topY = baselineY - fontHeight
     const itemWidth = rm.width
     rm.occurrences.forEach((occ, occIdx) => {
@@ -219,14 +244,13 @@ async function drawHighlightsForPage() {
       const fracWidth = occ.length / rm.text.length
       const subX = baseX + itemWidth * fracStart
       const subW = itemWidth * fracWidth
-      // Converte punti: top-left e bottom-right
       const vpTopLeft = viewport.convertToViewportPoint(subX, topY)
       const vpBottomRight = viewport.convertToViewportPoint(subX + subW, baselineY)
       let x = vpTopLeft[0]
       let y = vpTopLeft[1] + fudgeY
       let w = vpBottomRight[0] - vpTopLeft[0]
       let h = vpBottomRight[1] - vpTopLeft[1]
-      if (h < 0) { h = Math.abs(h); y = y - h } // correzione se coordinate invertite
+      if (h < 0) { h = Math.abs(h); y = y - h }
       globalCounter++
       const isCurrent = flatMatches.value[currentMatchIndex.value]?.page === rm.page && flatMatches.value[currentMatchIndex.value].occurrenceIndex === occIdx
       const box = document.createElement('div')
@@ -257,7 +281,6 @@ function goToMatch(index: number) {
   const target = flatMatches.value[index]
   if (target.page !== page.value) {
     page.value = target.page
-    // aspetta il render canvas
     setTimeout(() => drawHighlightsForPage(), 250)
   } else {
     drawHighlightsForPage()
@@ -272,34 +295,62 @@ watch(pdf, () => { if (currentQuery.value) buildIndex() })
 </script>
 
 <template>
-  <div class="flex h-full flex-col">
-    <div class="mb-2 flex flex-wrap gap-2 text-xs">
+  <div ref="rootContainer" class="flex h-full flex-col bg-zinc-950">
+
+    <div class="mb-2 flex flex-wrap gap-2 text-xs p-1">
       <button @click="prevPage" :disabled="page===1" class="rounded bg-zinc-800 px-2 py-1 disabled:opacity-40">Prev</button>
       <button @click="nextPage" :disabled="page===pages" class="rounded bg-zinc-800 px-2 py-1 disabled:opacity-40">Next</button>
-      <span class="px-2 py-1">{{ page }} / {{ pages || '?' }}</span>
+      <span class="px-2 py-1 text-white">{{ page }} / {{ pages || '?' }}</span>
       <button @click="zoomOut" class="rounded bg-zinc-800 px-2 py-1">-</button>
       <button @click="zoomIn" class="rounded bg-zinc-800 px-2 py-1">+</button>
       <button @click="rotate" class="rounded bg-zinc-800 px-2 py-1">⟳</button>
-      <span v-if="currentQuery" class="px-2 py-1">Query: "{{ currentQuery }}"</span>
+      <button @click="toggleFullscreen" class="rounded bg-zinc-800 px-2 py-1" title="Fullscreen">
+        <span v-if="isFullscreen">⤡</span>
+        <span v-else>⤢</span>
+      </button>
+      <span v-if="currentQuery" class="px-2 py-1 text-white">Query: "{{ currentQuery }}"</span>
       <span v-if="indexing" class="px-2 py-1 text-amber-400">Indicizzazione...</span>
-      <span v-if="!indexing && currentQuery && flatMatches.length" class="px-2 py-1">Match {{ currentMatchIndex+1 }} / {{ flatMatches.length }}</span>
+      <span v-if="!indexing && currentQuery && flatMatches.length" class="px-2 py-1 text-white">Match {{ currentMatchIndex+1 }} / {{ flatMatches.length }}</span>
       <button v-if="flatMatches.length" @click="prevMatch" class="rounded bg-zinc-800 px-2 py-1">◀</button>
       <button v-if="flatMatches.length" @click="nextMatch" class="rounded bg-zinc-800 px-2 py-1">▶</button>
       <span v-if="loadError" class="px-2 py-1 text-red-400">{{ loadError }}</span>
     </div>
-    <div ref="container" class="flex-1 overflow-auto rounded bg-zinc-950 p-1 relative">
-      <VuePDF v-if="pdf && !loading && !loadError" :pdf="pdf" :page="page" :scale="scale" :rotation="rotation" />
-      <p v-else-if="loading" class="p-4 text-center text-zinc-500">Caricamento...</p>
-      <p v-else-if="loadError" class="p-4 text-center text-red-400">{{ loadError }}</p>
-      <p v-else class="p-4 text-center text-zinc-500">PDF non disponibile</p>
+
+    <div ref="container" class="flex-1 overflow-auto rounded bg-zinc-950 p-1 relative flex">
+
+      <div class="relative m-auto shadow-lg">
+
+        <VuePDF
+            v-if="pdf && !loading && !loadError"
+            :pdf="pdf"
+            :page="page"
+            :scale="scale"
+            :rotation="rotation"
+        />
+
+        <div v-else-if="loading" class="p-8 text-center text-zinc-500 min-w-[200px]">
+          Caricamento...
+        </div>
+        <div v-else-if="loadError" class="p-8 text-center text-red-400 min-w-[200px]">
+          {{ loadError }}
+        </div>
+        <div v-else class="p-8 text-center text-zinc-500 min-w-[200px]">
+          PDF non disponibile
+        </div>
+
+      </div>
+
     </div>
   </div>
 </template>
 
 <style scoped>
-button { transition: background .15s; }
+button { transition: background .15s; color: white; }
 button:hover:not(:disabled) { background: rgb(63 63 70); }
 .pdf-search-overlay { position:absolute; inset:0; pointer-events:none; }
 .pdf-search-box { animation: fadeIn .18s ease; }
 @keyframes fadeIn { from { opacity:0; transform:scale(.98); } to { opacity:1; transform:scale(1); } }
+
+/* Stile opzionale per il fullscreen su vecchi browser che non gestiscono bene il flex */
+:fullscreen { overflow: hidden; }
 </style>

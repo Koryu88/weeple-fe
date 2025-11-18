@@ -1,7 +1,8 @@
 <script setup lang="ts">
 const model = defineModel<boolean>({ required: true })
-const { label, description, disabled, size } = withDefaults(defineProps<{ label?: string; description?: string; disabled?: boolean; size?: 'sm' | 'md' }>(), { size: 'md' })
+const { label, description, disabled, size = 'md' } = defineProps<{ label?: string; description?: string; disabled?: boolean; size?: 'sm' | 'md' }>()
 const id = `switch-${Math.random().toString(36).slice(2, 9)}`
+
 </script>
 
 <template>
